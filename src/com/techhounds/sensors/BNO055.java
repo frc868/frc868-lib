@@ -2,8 +2,11 @@ package com.techhounds.sensors;
 
 import java.util.TimerTask;
 
+import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -771,6 +774,87 @@ public class BNO055 {
 	public double[] getVector() {
 		return xyz;
 	}
+
+	/**
+	 * Returns a pseudo {@class Gyro} instance that you can use to monitor
+	 * rotation about the x-axis.
+	 * 
+	 * <p>
+	 * NOTE: The {@class Gyro} returned has some limitations/features:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li>The {@link Gyro#calibrate()} method does nothing.</li>
+	 * <li>The {@link Gyro#reset()} method only resets that instance to zero
+	 * (any other Gyro objects created will be unchanged). This is typically
+	 * what you want.</li>
+	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
+	 * </ul>
+	 * 
+	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 */
+	public GyroBase getGyroX() {
+		return new GyroAdapter(xyz[0], false) {
+			@Override
+			protected double getSensorValue() {
+				return xyz[0];
+			}
+		};
+	}
+
+	/**
+	 * Returns a pseudo {@class Gyro} instance that you can use to monitor
+	 * rotation about the y-axis.
+	 * 
+	 * <p>
+	 * NOTE: The {@class Gyro} returned has some limitations/features:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li>The {@link Gyro#calibrate()} method does nothing.</li>
+	 * <li>The {@link Gyro#reset()} method only resets that instance to zero
+	 * (any other Gyro objects created will be unchanged). This is typically
+	 * what you want.</li>
+	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
+	 * </ul>
+	 * 
+	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 */
+	public GyroBase getGyroY() {
+		return new GyroAdapter(xyz[1], false) {
+			@Override
+			protected double getSensorValue() {
+				return xyz[1];
+			}
+		};
+	}
+
+	/**
+	 * Returns a pseudo {@class Gyro} instance that you can use to monitor
+	 * rotation about the z-axis.
+	 * 
+	 * <p>
+	 * NOTE: The {@class Gyro} returned has some limitations/features:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li>The {@link Gyro#calibrate()} method does nothing.</li>
+	 * <li>The {@link Gyro#reset()} method only resets that instance to zero
+	 * (any other Gyro objects created will be unchanged). This is typically
+	 * what you want.</li>
+	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
+	 * </ul>
+	 * 
+	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 */
+	public GyroBase getGyroZ() {
+		return new GyroAdapter(xyz[2], false) {
+			@Override
+			protected double getSensorValue() {
+				return xyz[2];
+			}
+		};
+	}
 	
 	/**
 	 * The heading of the sensor (x axis) in continuous format. Eg rotating the
@@ -871,7 +955,29 @@ public class BNO055 {
 		SmartDashboard.putNumber("BNO055 Read Dur", readDurationLast);
 		SmartDashboard.putNumber("BNO055 Read Max", readDurationMax);			
 		SmartDashboard.putNumber("BNO055 Read Over", readDurationOver);	
-	}	
+	}
+	
+	/**
+	 * Removes the SmartDashboard diagnostics from the network tables.
+	 */
+	public void clearDashboard() {
+		NetworkTable sd = NetworkTable.getTable("SmartDashboard");
+
+		sd.delete("BNO055 Present");
+		sd.delete("BNO055 Heading");
+		sd.delete("BNO055 Initialized");
+		sd.delete("BNO055 X");
+		sd.delete("BNO055 Y");
+		sd.delete("BNO055 Z");
+		sd.delete("BNO055 Gyro Cal");
+		sd.delete("BNO055 Calibrated");
+		sd.delete("BNO055 Sys Cal");
+		sd.delete("BNO055 Mag Cal");
+		sd.delete("BNO055 Accel Cal");
+		sd.delete("BNO055 Read Dur");
+		sd.delete("BNO055 Read Max");
+		sd.delete("BNO055 Read Over");
+	}
 
 	/**
 	 * Writes an 8 bit value over I2C
