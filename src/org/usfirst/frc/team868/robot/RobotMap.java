@@ -1,6 +1,6 @@
 package org.usfirst.frc.team868.robot;
 
-import com.techhounds.sensors.BNO055;
+import com.techhounds.lib.sensors.BNO055;
 
 import edu.wpi.first.wpilibj.I2C;
 

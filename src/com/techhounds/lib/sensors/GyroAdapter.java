@@ -1,4 +1,4 @@
-package com.techhounds.sensors;
+package com.techhounds.lib.sensors;
 
 import edu.wpi.first.wpilibj.GyroBase;
 
@@ -21,6 +21,8 @@ public abstract class GyroAdapter extends GyroBase {
 	private int turns;
 	// Whether or not the rate value is provided
 	private boolean hasRate;
+	// Will be set to true if gyro is mounted such that the values it returns are inverted
+	private boolean inverted;
 
 	/**
 	 * Construct a new instance for a sensor that does not wrap around.
@@ -77,6 +79,24 @@ public abstract class GyroAdapter extends GyroBase {
 				return 0.0;
 			}
 		};
+	}
+
+	/**
+	 * Indicates whether the gyro was mounted upside down and the values returned by getAngle() are negated.
+	 * 
+	 * @return true if gyro is mounted upside down.
+	 */
+	public boolean isInverted() {
+		return inverted;
+	}
+
+	/**
+	 * Set whether the gyro was mounted upside down or not.
+	 * 
+	 * @param inverted Pass true if gyro is mounted upside down.
+	 */
+	public void setInverted(boolean inverted) {
+		this.inverted = inverted;
 	}
 
 	/**
@@ -144,7 +164,7 @@ public abstract class GyroAdapter extends GyroBase {
 		}
 		lastVal = curVal;
 
-		return angle;
+		return (inverted ? -angle : angle);
 	}
 
 	/**

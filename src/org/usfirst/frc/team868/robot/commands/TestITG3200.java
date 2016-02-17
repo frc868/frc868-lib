@@ -3,7 +3,7 @@ package org.usfirst.frc.team868.robot.commands;
 import org.usfirst.frc.team868.robot.OI;
 import org.usfirst.frc.team868.robot.RobotMap;
 
-import com.techhounds.sensors.ITG3200;
+import com.techhounds.lib.sensors.ITG3200;
 
 import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.command.Command;

@@ -2,7 +2,7 @@ package org.usfirst.frc.team868.robot.commands;
 
 import org.usfirst.frc.team868.robot.OI;
 
-import com.techhounds.sensors.BNO055;
+import com.techhounds.lib.sensors.BNO055;
 
 import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.I2C;
