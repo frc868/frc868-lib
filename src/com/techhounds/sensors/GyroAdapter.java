@@ -60,6 +60,26 @@ public abstract class GyroAdapter extends GyroBase {
 	}
 
 	/**
+	 * Creates a fake Gyro object that always reports 0 degrees and 0 degrees/second.
+	 * 
+	 * @return A Gyro object that is stuck at zero (when you need a non-null gyro).
+	 */
+	public static GyroBase createFakeGyro() {
+		return new GyroAdapter(0, true) {
+			
+			@Override
+			protected double getSensorValue() {
+				return 0;
+			}
+			
+			@Override
+			public double getRate() {
+				return 0.0;
+			}
+		};
+	}
+
+	/**
 	 * Get the current position (in degrees) reported by the sensor.
 	 * 
 	 * <p>
