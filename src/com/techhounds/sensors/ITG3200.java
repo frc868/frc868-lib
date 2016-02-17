@@ -39,7 +39,6 @@ import java.io.PrintStream;
 
 import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -56,7 +55,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * mounted flat (so Z axis is used to track direction robot is facing).</li>
  * <li>Construct a single instance of the {@link ITG3200} class to be shared
  * throughout your Robot code.</li>
- * <li>Use the {@link #createGyroZ()} or {@link #getRotationZ()} methods to
+ * <li>Use the {@link #createGyroZ()} methods to
  * track your robots rotation (direction your robot is
  * facing).</li>
  * </ul>
@@ -122,141 +121,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 90 degrees.
  * </p>
  * <ul>
- * <li>In your command's initialize method, use the {@link #getRotationZ()} and
- * the {@link Rotation#zero()} method on the returned {@link Rotation} object to
- * track how much you have turned.</li>
- * <li>Use the {@link Rotation} object as a PID source and/or check the current
- * angle reported by the {@link Rotation} object in your isFinished() method.</li>
+ * <li>In your command's initialize method, use the {@link #createGyroZ()} to construct a {@link Gyro} instance where the current direction is treated as zero.</li>
+ * <li>Use the {@link Gyro} object as a PID source and/or check the current
+ * angle reported by the {@link Gyro#getAngle()} method in the Gyro object in your isFinished() method.</li>
  * </ul>
  */
 public final class ITG3200 {
-
-	/**
-	 * Object used to monitor robot rotation.
-	 * 
-	 * <ul>
-	 * <li>Use this class to track how much your robot has rotated.</li>
-	 * <li>Use the {@link ITG3200#getRotationZ()} to create an instance to track
-	 * how much your robot has rotated around the z-axis (direction robot is
-	 * facing - useful for making turns)..</li>
-	 * <li>Use the {@link ITG3200#getRotationX()} to create an instance to track
-	 * how much your robot has rotated around the x-axis (hopefully not much
-	 * unless you are tipping).</li>
-	 * <li>Use the {@link ITG3200#getRotationY()} to create an instance to track
-	 * how much your robot has rotated around the y-axis (hopefully not much
-	 * unless you are tipping).</li>
-	 * <li>Use the {@link ITG3200#getRo </ul>
-	 */
-	public final class Rotation implements RotationTracker {
-		/** Raw axis accumulator on gyro associated with this rotation tracker. */
-		private Accumulator m_axis;
-		/**
-		 * The degrees reported by the accumulator the last time this tracker
-		 * was zeroed.
-		 */
-		private double m_zeroDeg;
-		/**
-		 * The number of readings reported by the accumulator the last time this
-		 * tracker was zeroed.
-		 */
-		private int m_zeroCnt;
-
-		/**
-		 * Constructor is protected, instances are created through the
-		 * {@link ITG3200} methods.
-		 * 
-		 * @param axis
-		 *            An accumulator from the gyro for the axis to be tracked.
-		 */
-		private Rotation(Accumulator axis) {
-			m_axis = axis;
-			m_zeroDeg = 0;
-			m_zeroCnt = 0;
-		}
-
-		/**
-		 * Zero the tracker (sets the current heading/direction as the zero
-		 * point).
-		 */
-		public void zero() {
-			m_zeroDeg = m_axis.getDegrees();
-			m_zeroCnt = m_axis.getReadings();
-		}
-
-		/**
-		 * Get the number of degrees rotated since last zeroed.
-		 * 
-		 * @return A signed number of degrees [-INF, +INF].
-		 */
-		public double getAngle() {
-			double angle = m_axis.getDegrees() - m_zeroDeg;
-			return angle;
-		}
-
-		/**
-		 * Get the total number of times the raw values from the gyro have been
-		 * read since zeroed.
-		 * 
-		 * @return A diagnostic count that can be used to make sure the angle is
-		 *         still being updated.
-		 */
-		public int getReadings() {
-			return m_axis.getReadings() - m_zeroCnt;
-		}
-
-		/**
-		 * Returns the last raw (integer) value read from the gyro for the axis.
-		 * 
-		 * @return An integer value from the ITG-3200 for the associated axis.
-		 */
-		public int getAngleRateRaw() {
-			return m_axis.getRaw();
-		}
-
-		/**
-		 * Returns the current rotation rate in degrees/second from the last
-		 * reading.
-		 * 
-		 * @return How quickly the system is rotating about the axis in
-		 *         degrees/second.
-		 */
-		public double getAngleRate() {
-			return getAngleRateRaw() * COUNT_TO_DEGSEC;
-		}
-
-		/**
-		 * Returns the angle value from {@link #getAngle()} so object can be
-		 * used as a source to a PID controller.
-		 * 
-		 * @return See {@link #getAngle()}.
-		 * 
-		 * @see edu.wpi.first.wpilibj.PIDSource#pidGet()
-		 */
-		@Override
-		public double pidGet() {
-			return getAngle();
-		}
-
-		/**
-		 * Ignore requests to change the PID source type (throws an exception if
-		 * you try to change it to something other than kDisplacement).
-		 */
-		@Override
-		public void setPIDSourceType(PIDSourceType pidSource) {
-			if (pidSource != PIDSourceType.kDisplacement) {
-				throw new IllegalArgumentException(
-						"Only displacement is supported by this PIDSource");
-			}
-		}
-
-		/**
-		 * Returns the PID source type - always returns kDisplacement.
-		 */
-		@Override
-		public PIDSourceType getPIDSourceType() {
-			return PIDSourceType.kDisplacement;
-		}
-	}
 
 	//
 	// List of I2C registers which the ITG-3200 uses from the datasheet
@@ -513,39 +383,6 @@ public final class ITG3200 {
 				return m_z.getDegPerSec();
 			}
 		};
-	}
-
-	/**
-	 * Construct a {@link Rotation} object used to monitor rotation about the
-	 * Z-axis.
-	 * 
-	 * @return A rotation object that very useful for checking the direction
-	 *         your robot is facing.
-	 */
-	public Rotation getRotationZ() {
-		return new Rotation(m_z);
-	}
-
-	/**
-	 * Construct a {@link Rotation} object used to monitor rotation about the
-	 * X-axis.
-	 * 
-	 * @return A rotation object that is probably only useful for checking if
-	 *         your robot is starting to tip over.
-	 */
-	public Rotation getRotationX() {
-		return new Rotation(m_x);
-	}
-
-	/**
-	 * Construct a {@link Rotation} object used to monitor rotation about the
-	 * Y-axis.
-	 * 
-	 * @return A rotation object that is probably only useful for checking if
-	 *         your robot is starting to tip over.
-	 */
-	public Rotation getRotationY() {
-		return new Rotation(m_y);
 	}
 
 	/**
