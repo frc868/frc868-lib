@@ -26,6 +26,28 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *        imu = BNO055.getInstance(BNO055.opmode_t.OPERATION_MODE_IMUPLUS,
  *        		BNO055.vector_type_t.VECTOR_EULER);
  *    }
+ *    
+ *  Example 2: When you want gryo angle readings:
+ *  
+ *  <pre><code>
+ *  
+ *  public void robotInit() {
+ *    bno055 = BNO055.getInstance(I2C.Port.kOnboard);
+ *  }
+ *  
+ *  public Gyro getGyroX() {
+ *    return bno055.createGyroX();
+ *  }
+ *  
+ *  public Gyro getGyroY() {
+ *    return bno055.createGyroY();
+ *  }
+ *  
+ *  public Gyro getGyroZ() {
+ *    return bno055.createGyroZ();
+ *  }
+ *  </code></pre>
+ *    
  * 
  * You can check the status of the sensor by using the following methods:
  *   isSensorPresent(); //Checks if the code can talk to the sensor over I2C
@@ -359,6 +381,17 @@ public class BNO055 {
 		
 		executor = new java.util.Timer();
 		executor.schedule(new BNO055UpdateTask(this), 0L, THREAD_PERIOD);
+	}
+
+	/**
+	 * Get an instance of the sensor configured for IMU mode and EULER format for the purpose
+	 * of reading gyro angles (assumes sensor has default I2C address).
+	 * 
+	 * @param port the physical port the sensor is plugged into on the roboRio (I2C.Port.kOnboard or I2C.Port.kMXP).
+	 * @return the instantiated BNO055 object
+	 */
+	public static BNO055 getInstance(I2C.Port port) {
+		return getInstance(opmode_t.OPERATION_MODE_IMUPLUS, vector_type_t.VECTOR_EULER, port, BNO055.BNO055_ADDRESS_A);
 	}
 
 	/**
@@ -791,10 +824,10 @@ public class BNO055 {
 	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroX() {
-		return new GyroAdapter(xyz[0], false) {
+	public GyroBase createGyroX() {
+		return new GyroAdapter(xyz[0], 0, 360, false) {
 			@Override
 			protected double getSensorValue() {
 				return xyz[0];
@@ -818,10 +851,10 @@ public class BNO055 {
 	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroY() {
-		return new GyroAdapter(xyz[1], false) {
+	public GyroBase createGyroY() {
+		return new GyroAdapter(xyz[1], -90, 90, false) {
 			@Override
 			protected double getSensorValue() {
 				return xyz[1];
@@ -845,10 +878,10 @@ public class BNO055 {
 	 * <li>The {@link Gyro#getRate()} method is NOT implemented (do not use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroZ() {
-		return new GyroAdapter(xyz[2], false) {
+	public GyroBase createGyroZ() {
+		return new GyroAdapter(xyz[2], -180, +180, false) {
 			@Override
 			protected double getSensorValue() {
 				return xyz[2];

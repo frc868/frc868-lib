@@ -115,9 +115,9 @@ public abstract class GyroAdapter extends GyroBase {
 			double halfSpan = span / 2;
 
 			if (change > halfSpan) {
-				turns++;
-			} else if (change < -halfSpan) {
 				turns--;
+			} else if (change < -halfSpan) {
+				turns++;
 			}
 
 			angle += turns * span;

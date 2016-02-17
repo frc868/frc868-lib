@@ -56,10 +56,45 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * mounted flat (so Z axis is used to track direction robot is facing).</li>
  * <li>Construct a single instance of the {@link ITG3200} class to be shared
  * throughout your Robot code.</li>
- * <li>Use the {@link #getGyroZ()} or {@link #getRotationZ()} methods to
+ * <li>Use the {@link #createGyroZ()} or {@link #getRotationZ()} methods to
  * track your robots rotation (direction your robot is
  * facing).</li>
  * </ul>
+ * 
+ * <pre><code>
+ * ITG3200 sensor;
+ * GyroBase gyrox;
+ * GyroBase gyroy;
+ * GyroBase gyroz;
+ * 
+ * public void robotInit() {
+ * 	 sensor = new ITG3200(RobotMap.ITG3200_PORT,
+ *				          RobotMap.ITG3200_JUMPERED);
+ *
+ *   gyrox = sensor.createGyroX();
+ *   gyroy = sensor.createGyroY();
+ *   gyroz = sensor.createGyroZ();
+ *   
+ *	 // Add Gyro objects to LiveWindow test mode
+ * 	 String group = "ITG-3200";
+ *   LiveWindow.addSensor(group, "Gyro (x)", gyrox);
+ * 	 LiveWindow.addSensor(group, "Gyro (y)", gyroy);
+ *   LiveWindow.addSensor(group, "Gyro (z)", gyroz);
+ * }
+ * 
+ * public double getGyroAngleX() {
+ *   return gyrox.getAngle();
+ * }
+ * 
+ * public double getGyroAngleY() {
+ *   return gyroy.getAngle();
+ * }
+ * 
+ * public double getGyroAngleZ() {
+ *   return gyroz.getAngle();
+ * }
+ * </code></pre>
+ * 
  * <p>
  * Be aware of the following:
  * </p>
@@ -400,9 +435,9 @@ public final class ITG3200 {
 	 * <li>The {@link Gyro#getRate()} method is implemented (you can use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroX() {
+	public GyroBase createGyroX() {
 		return new GyroAdapter(m_x.getDegrees(), true) {
 			@Override
 			protected double getSensorValue() {
@@ -432,9 +467,9 @@ public final class ITG3200 {
 	 * <li>The {@link Gyro#getRate()} method is implemented (you can use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroY() {
+	public GyroBase createGyroY() {
 		return new GyroAdapter(m_y.getDegrees(), true) {
 			@Override
 			protected double getSensorValue() {
@@ -464,9 +499,9 @@ public final class ITG3200 {
 	 * <li>The {@link Gyro#getRate()} method is implemented (you can use it).</li>
 	 * </ul>
 	 * 
-	 * @return A {@class Gyro} object you can used for tracking rotation.
+	 * @return A new {@class Gyro} object you can used for tracking rotation.
 	 */
-	public GyroBase getGyroZ() {
+	public GyroBase createGyroZ() {
 		return new GyroAdapter(m_z.getDegrees(), true) {
 			@Override
 			protected double getSensorValue() {
